@@ -1,6 +1,8 @@
 # My own excluded files/folder
 build/
 debug/
+.cache/*
+compile_commands.json
 
 # Prerequisites
 *.d
