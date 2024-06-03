@@ -15,36 +15,6 @@
  */
 static int new_object(lua_State* L) {
     int type = lua_type(L, 1);
-    void* udata;
-
-    // handle each acceptable type and throw error if it's not a good one.
-    switch (type) {
-        case LUA_TSTRING:
-            udata = lua_newuserdata(L, sizeof(const char*));
-            break;
-        case LUA_TBOOLEAN:
-            udata = lua_newuserdata(L, sizeof(int));
-            break;
-        case LUA_TNUMBER:
-            udata = lua_newuserdata(L, sizeof(lua_Number));
-            break;
-        case LUA_TLIGHTUSERDATA:
-            udata = lua_newuserdata(L, sizeof(const void*));
-            break;
-        case LUA_TFUNCTION:
-            udata = lua_newuserdata(L, sizeof(const void*));
-            break;
-        case LUA_TTABLE:
-            udata = lua_newuserdata(L, sizeof(const void*));
-            break;
-        case LUA_TUSERDATA:
-            udata = lua_newuserdata(L, sizeof(const void*));
-            break;
-        default:
-            luaL_error(L, "You must pass a valid argument to this function");
-            return 0;
-            break;
-    }
 
     // Creation of the table for set it as a metatable.
     const char* key = "__index";
@@ -56,6 +26,47 @@ static int new_object(lua_State* L) {
     lua_pushlightuserdata(L, &head_node);
     lua_setmetatable(L, -1);
 
+
+    ONode_t* head = (ONode_t*)head_node;
+    head->value = lua_touserdata(L, -1);
+    head->next = NULL;
+
+    // handle each acceptable type and throw error if it's not a good one.
+    switch (type) {
+        case LUA_TBOOLEAN:
+            lua_newuserdata(L, sizeof(int));
+            head->type = bool;
+            break;
+        case LUA_TNUMBER:
+            lua_newuserdata(L, sizeof(lua_Number));
+            head->type = number;
+            break;
+        case LUA_TSTRING:
+            lua_newuserdata(L, sizeof(const char*));
+            head->type = str;
+            break;
+        case LUA_TLIGHTUSERDATA:
+            lua_newuserdata(L, sizeof(const void*));
+            head->type = ludata;
+            break;
+        case LUA_TFUNCTION:
+            lua_newuserdata(L, sizeof(const void*));
+            head->type = fn;
+            break;
+        case LUA_TTABLE:
+            lua_newuserdata(L, sizeof(const void*));
+            head->type = table;
+            break;
+        case LUA_TUSERDATA:
+            lua_newuserdata(L, sizeof(const void*));
+            head->type = udata;
+            break;
+        default:
+            luaL_error(L, "You must pass a valid argument to this function");
+            return 0;
+            break;
+    }
+    
     return 1;
 }
 

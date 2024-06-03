@@ -1,7 +1,18 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-typedef struct ONode {
+typedef enum Accepted_type {
+    str = LUA_TSTRING,
+    bool = LUA_TBOOLEAN,
+    number = LUA_TNUMBER,
+    udata = LUA_TUSERDATA,
+    table = LUA_TTABLE,
+    fn = LUA_TFUNCTION,
+    ludata = LUA_TLIGHTUSERDATA,
+} Accepted_type;
+
+typedef struct {
+    Accepted_type type;
     void* value;
     struct ONode* next;
 } ONode_t;
